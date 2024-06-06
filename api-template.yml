@@ -1,0 +1,302 @@
+openapi: 3.1.0
+info:
+  title: API Formulario de Contacto
+  version: v1
+  description: API para la gestión de formularios de contacto en el portfolio
+  contact:
+    name: Vanessa Fernandez
+    email: marivafp@gmail.com
+    url: https://portfolio.com/contact
+  license:
+    name: MIT
+    url: https://portfolio.com/license
+  termsOfService: https://portfolio.com/terms-Of-Service
+servers:
+  - url: https://api-dev.portfolio.com/contact/v1
+    description: Development server
+  - url: https://api-sandbox.portfolio.com/contact/v1
+    description: Sandbox server
+  - url: https://api.portfolio.com/contact/v1
+    description: Production server
+tags:
+  - name: Contactos
+    description: Operaciones y recursos relacionados con formularios de contacto
+security: 
+  -  apiKeyAuth: []    
+paths:
+  /contacts:
+    post:
+      summary: Crear una nueva presentación de formulario de contacto
+      description: Endpoint para crear una nueva presentación de formulario de contacto
+      operationId: createContact
+      tags:
+        - Contactos
+      requestBody:
+        description: Cuerpo de solicitud para la creación de una presentación de formulario de contacto
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Definicion del modelo del formulario de contacto
+              $ref: '#/components/schemas/Contact'
+              examples:
+                contactoEjemplo:
+                  $ref: '#/components/examples/exampleContact'
+      responses:
+        '201':
+          description: Presentación de formulario de contacto creada exitosamente
+          headers:  
+            Location:
+              description: URL del recurso creado
+              schema: 
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+              examples:
+                contactoEjemplo:
+                  $ref: '#/components/examples/exampleContact' 
+        '400':
+          description: Error en los parámetros de entrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/standardErrorResponse'
+              examples: 
+                invalidEmailFormat:
+                  summary: Formato de email inválido
+                  value: 
+                    code: 400
+                    message: 'El formato del email es inválido'
+                invalidPhoneNumber:
+                  summary: Formato del número de teléfono inválido
+                  value: 
+                    code: 400
+                    message: 'El número de teléfono contiene caracteres no permitidos o excesivo'
+                invalidNameFormat:
+                  summary: Formato de nombre inválido
+                  value: 
+                    code: 400
+                    message: 'El nombre contiene caracteres no permitidos'  
+                messageTooLong:
+                  summary: Mensaje demasiado largo
+                  value: 
+                    code: 400
+                    message: 'El mensaje excede el límite de caracteres permitidos'
+        '401':
+          description: Error de autenticación
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/standardErrorResponse'
+              #examples: 
+                unauthorized:
+                  summary: No autenticado
+                  value:
+                    code: 401
+                    message: 'No autenticado. Por favor, inicie sesión'
+        '403':
+          description: Error de autorización
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/standardErrorResponse'
+              examples: 
+                forbidden:
+                  summary: No autorizado
+                  value:
+                    code: 403
+                    message: 'No tiene permiso para realizar esta acción'            
+        default: 
+          description: Error por defecto
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/standardErrorResponse'
+              examples: 
+                defaultError:
+                  summary: Error por defecto
+                  value:
+                    code: 500
+                    message: 'Ocurrió un error inesperado'  
+                      
+    get:
+      summary: Obtener lista de contactos
+      description: Endpoint para obtener toda la lista de contactos
+      operationId: getAllContacts
+      tags:
+        - Contactos
+      parameters: 
+        - in: query
+          name: sortBy
+          schema: 
+            type: string
+            enum: [name]
+          description: Campo por el cual ordenar los resultados (nombre)
+          required: false
+        - in: query
+          name: sortOrder
+          schema: 
+            type: string
+            enum: [asc, desc]
+          description: Orden ascendente (asc) o descendente (desc)
+          required: false
+        - in: query
+          name: page 
+          schema: 
+            type: integer
+            minimum: 1
+          description: Número de página para la paginación
+          required: false          
+        - in: query
+          name: pageSize
+          schema: 
+            type: integer
+            minimum: 1 
+            maximum: 15 
+          description: Tamaño de página para la paginación (máximo 15)
+          required: false  
+      responses:
+        '200':
+          description: Respuesta exitosa a la solicitud de la lista de contactos
+          content:
+            application/json:
+              schema:
+                description: Modelo para lista de contactos
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Contact'
+              examples: 
+                listaContactos:
+                  $ref: "#/components/examples/exampleContact"   
+        '400': 
+          $ref: '#/components/responses/badRequestResponse' 
+        '403':
+          $ref: '#/components/responses/forbiddenResponse'        
+        default:
+          $ref: '#/components/responses/defaultResponse'
+              
+             
+components: 
+  schemas:
+    Contact:
+      type: object
+      required: 
+        -  name
+        -  phone
+        -  email
+        -  message
+      properties: 
+        id: 
+          type: string
+          format: uuid
+          maxLength: 36
+          minLength: 36
+          pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+          example: '62977d46-7a50-41c9-8d84-38272ac2a8df'
+          readOnly: true
+        name:
+          type: string
+          description: Nombre de la persona que envía el formulario
+          pattern: "^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\\s]+$"
+          example: 'Juan Pérez'
+        phone:
+          type: string
+          description: Número de teléfono de la persona que envía el formulario
+          pattern: "^[0-9]+$"
+          maxLength: 15 
+          example: '123456789'
+        email:
+          type: string
+          description: Email de la persona que envía el formulario
+          format: email
+          example: marivafp@gmail.com
+        message:
+          type: string
+          description: Mensaje de la persona que envía el formulario
+          maxLength: 500 
+    standardErrorResponse:
+      description: Modelo con el contenido estándar de respuesta de error
+      type: object
+      properties: 
+        errors:
+          description: Listado de objetos con detalle de los errores 
+          type: array
+          items: 
+            type: object
+            properties:  
+              code:
+                description: Código de error
+                type: string
+                minLength: 6 
+                maxLength: 10 
+                example: 'BADR-001'
+              message:
+                description: Contenido del mensaje de error 
+                type: string
+                minLength: 6 
+                maxLength: 2048 
+                example: 'Valor requerido' 
+              field:
+                description: Nombre del campo en donde se detectó el error 
+                type: string
+                minLength: 4 
+                maxLength: 100 
+                example: name  
+                nullable: true
+            required: 
+              -  code
+              -  message  
+              - field 
+      required: 
+        -  errors           
+
+  examples: 
+    exampleContact:
+      summary: Ejemplo de contacto
+      value: 
+        id: '550e8400-e29b-41d4-a716-446655440000'
+        name: 'Juan Pérez'
+        phone: '123456789'
+        email: 'juan.perez@example.com'
+        message: 'Hola, me gustaría saber más sobre tus servicios'                             
+  parameters: 
+  requestBodies:           
+  headers:   
+  responses:  
+    badRequestResponse:
+      description: Respuesta de error en parámetros de entrada
+      content: 
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/standardErrorResponse'
+          example:
+            errors: 
+              - code: 'BADR-001'
+                message: 'Valor requerido'
+                field: name  
+    forbiddenResponse:
+      description: Respuesta de error de autorización'
+      content: 
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/standardErrorResponse'
+          example: 
+            errors:
+              - code: 'FORB-001'
+                message: 'Token inválido'
+                field: null            
+    defaultResponse:
+      description: Respuesta de error default para errores no controlados
+      content: 
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/standardErrorResponse'      
+          example:
+            errors:
+              - code: 'SERVER-500'
+                message: 'Internal server error' 
+                field: null        
+  securitySchemes: 

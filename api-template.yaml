@@ -66,33 +66,7 @@ paths:
                 $ref: '#/components/schemas/standardErrorResponse'
               examples: 
                 invalidRequest:
-                  summary: Errores en los parámetros de entrada
-                  value:
-                    errors:
-                      - code: 'BADR-001'
-                        message: 'El campo "email" es requerido.'
-                        field: email
-                      - code: 'BADR-002'
-                        message: 'El formato del email es inválido.'
-                        field: email
-                      - code: 'BADR-003'
-                        message: 'El campo "phone" es requerido.'
-                        field: phone
-                      - code: 'BADR-004'
-                        message: 'El telefono debe tener el siguiente pattern "^[0-9]+$".'
-                        field: phone
-                      - code: 'BADR-005'  
-                        message: 'El campo "name" es requerido.'
-                        field: name
-                      - code: 'BADR-006'
-                        message: 'El nombre tiene un formato inválido.'
-                        field: name
-                      - code: 'BADR-007'
-                        message: 'El campo "message" es requerido.'
-                        field: message
-                      - code: 'BADR-008'
-                        message: 'Mensaje demasiado largo'
-                        field: message
+                  $ref: '#/components/examples/InvalidRequestExample'
         '403':
           $ref: '#/components/responses/forbiddenResponse'
         default: 
@@ -200,9 +174,26 @@ paths:
       description: Endpoint para eliminar contacto por ID 
       operationId: deleteById
       tags:
-        - Contactos 
-             
-
+        - Contactos
+      parameters: 
+        - name: id 
+          in: path
+          required: true
+          description: ID del contacto   
+          schema: 
+            type: string
+            format: uuid
+      responses: 
+        '204':
+          description: Contacto eliminado exitosamente
+        '400':
+          $ref: '#/components/responses/badRequestResponse'
+        '403':
+          $ref: '#/components/responses/forbiddenResponse'
+        '404':
+          $ref: '#/components/responses/notFoundResponse'
+        default: 
+          $ref: '#/components/responses/defaultResponse'
 components: 
   schemas:
     Contact:
@@ -273,7 +264,7 @@ components:
             required: 
               -  code
               -  message  
-              - field 
+              -  field 
       required: 
         -  errors           
 
@@ -285,7 +276,36 @@ components:
         name: 'Juan Pérez'
         phone: '123456789'
         email: 'juan.perez@example.com'
-        message: 'Hola, me gustaría saber más sobre tus servicios'                             
+        message: 'Hola, me gustaría saber más sobre tus servicios' 
+    InvalidRequestExample:
+      summary: Errores en los parámetros de entrada
+      value: 
+        errors:
+          - code: 'BADR-001'
+            message: 'El campo "email" es requerido.'
+            field: email
+          - code: 'BADR-002'
+            message: 'El formato del email es inválido'
+            field: email
+          - code: 'BADR-003'
+            message: 'El campo "phone" es requerido'
+            field: phone
+          - code: 'BADR-004'
+            message: 'El teléfono debe tener el siguiente pattern "^[0-9]+$"'  
+            field: phone
+          - code: 'BADR-005'
+            message: 'El campo "name" es requerido'
+            field: name
+          - code: 'BADR-006'
+            message: 'El nombre debe tener el siguiente pattern "^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\\s]+$"'
+            field: name
+          - code: 'BADR-007'
+            message: 'El campo "message" es requerido'
+            field: message
+          - code: 'BADR-008'  
+            message: 'Mensaje demasiado largo'
+            field: message      
+
   parameters: {}
   requestBodies: {}           
   headers:   {}

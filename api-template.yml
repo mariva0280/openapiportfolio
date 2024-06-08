@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: API Formulario de Contacto
   version: v1
@@ -12,11 +12,11 @@ info:
     url: https://portfolio.com/license
   termsOfService: https://portfolio.com/terms-Of-Service
 servers:
-  - url: https://localhost:5000/contact/v1
+  - url: https://localhost:5000/contacts/v1
     description: Open api Mocker
-  - url: https://api-sandbox.portfolio.com/contact/v1
+  - url: https://api-sandbox.portfolio.com/contacts/v1
     description: Sandbox server
-  - url: https://api.portfolio.com/contact/v1
+  - url: https://api.portfolio.com/contacts/v1
     description: Production server
 tags:
   - name: Contactos
@@ -37,11 +37,10 @@ paths:
         content:
           application/json:
             schema:
-              description: Definicion del modelo del formulario de contacto
               $ref: '#/components/schemas/Contact'
-              examples:
-                contactoEjemplo:
-                  $ref: '#/components/examples/exampleContact'
+            examples:
+              contactoEjemplo:
+                $ref: '#/components/examples/exampleContact'
       responses:
         '201':
           description: Presentación de formulario de contacto creada exitosamente

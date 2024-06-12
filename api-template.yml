@@ -22,7 +22,8 @@ tags:
   - name: Contactos
     description: Operaciones y recursos relacionados con formularios de contacto
 security: 
-  -  apiKeyAuth: []    
+  -  apiKeyAuth: []  
+  -  bearerAuth: []  
 paths:
   /contacts:
     post:
@@ -37,10 +38,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Contact'
+              $ref: '#/components/schemas/NewContact'
             examples:
-              contactoEjemplo:
-                $ref: '#/components/examples/exampleContact'
+              contactoEjemploPost:
+                $ref: '#/components/examples/exampleContactPost'
       responses:
         '201':
           description: Presentación de formulario de contacto creada exitosamente
@@ -53,10 +54,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Contact'
+                $ref: '#/components/schemas/standardContactResponse'
               examples:
                 'contactoEjemplo':
-                  $ref: '#/components/examples/exampleContact' 
+                  $ref: '#/components/examples/exampleContactPost' 
         '400':
           description: Error en los parámetros de entrada
           content:
@@ -112,23 +113,30 @@ paths:
           content:
             application/json:
               schema:
-                description: Modelo para lista de contactos
-                type: array
-                items: 
-                  $ref: '#/components/schemas/Contact'
+                type: object
+                properties: 
+                  data:
+                    type: array
+                    items: 
+                      $ref: "#/components/schemas/standardContactResponse"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                        example: 1
+                      totalPages:
+                        type: integer
+                        example: 3
+                      totalItems:
+                        type: integer
+                        example: 45
+                      pageSize:
+                        type: integer
+                        example: 15
               examples: 
-                'listaContactos':
-                  value:
-                    - id: '550e8400-e29b-41d4-a716-446655440000'
-                      name: 'Juan Pérez'
-                      phone: '123456789'
-                      email: 'juan.perez@example.com'
-                      message: 'Hola, me gustaría saber más sobre tus servicios' 
-                    - id: '550e8400-e29b-41d4-a716-446655440001'
-                      name: 'María López'
-                      phone: '987654321'
-                      email: 'maria.lopez@example.com'
-                      message: 'Me gustaría obtener información sobre sus tarifas.'
+                listaContactos:
+                  $ref: '#/components/examples/exampleContactList'
         '400': 
           $ref: '#/components/responses/badRequestResponse' 
         '403':
@@ -156,18 +164,16 @@ paths:
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/Contact'
+                  $ref: '#/components/schemas/standardContactResponse'
               examples: 
-                'contactoEjemplo':
-                  $ref: '#/components/examples/exampleContact'
-        '400': 
-          $ref: '#/components/responses/badRequestResponse' 
+                contactoEjemplo:
+                  $ref: '#/components/examples/exampleContactResponse' 
         '403':
           $ref: '#/components/responses/forbiddenResponse' 
         '404':
           $ref: '#/components/responses/notFoundResponse'         
         default:
-          $ref: '#/components/responses/defaultResponse'
+          $ref: '#/components/responses/defaultResponse'      
     delete:
       summary: Eliminar un contacto por ID 
       description: Endpoint para eliminar contacto por ID 
@@ -185,17 +191,69 @@ paths:
       responses: 
         '204':
           description: Contacto eliminado exitosamente
-        '400':
-          $ref: '#/components/responses/badRequestResponse'
         '403':
           $ref: '#/components/responses/forbiddenResponse'
         '404':
           $ref: '#/components/responses/notFoundResponse'
         default: 
           $ref: '#/components/responses/defaultResponse'
+    patch: 
+      summary: Actualizar parcialmente un contacto
+      description: Actualiza los campos nombre y telefono de un contacto
+      operationId: updateContactById
+      tags:
+        - Contactos
+      parameters:
+        - name: id
+          in: path 
+          required: true
+          description: ID del contacto
+          schema:         
+              type: string
+              format: uuid
+      requestBody: 
+        description: Datos parciales del contacto
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nombre de la persona que envía el formulario
+                  pattern: "^[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ\\s]+$"
+                  example: 'Juan Pérez'
+                phone:
+                  type: string
+                  description: Número de teléfono de la persona que envía el formulario
+                  pattern: "^[0-9]{1,12}$"
+                  example: '123456789'
+            examples:
+              examplePatchContact:
+                summary: Ejemplo de actualización parcial de contacto
+                value:
+                  name: 'Juan Pérez'
+                  phone: '123456789'
+      responses:
+        '200':
+          description: Respuesta exitosa a la solicitud de contacto por ID 
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/standardContactResponse'
+              examples: 
+                contactoEjemplo:
+                  $ref: '#/components/examples/exampleContactResponse' 
+        '403':
+          $ref: '#/components/responses/forbiddenResponse' 
+        '404':
+          $ref: '#/components/responses/notFoundResponse'         
+        default:
+          $ref: '#/components/responses/defaultResponse'            
 components: 
   schemas:
-    Contact:
+    NewContact:
       type: object
       required: 
         -  name
@@ -203,14 +261,6 @@ components:
         -  email
         -  message
       properties: 
-        id: 
-          type: string
-          format: uuid
-          maxLength: 36
-          minLength: 36
-          pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
-          example: '62977d46-7a50-41c9-8d84-38272ac2a8df'
-          readOnly: true
         name:
           type: string
           description: Nombre de la persona que envía el formulario
@@ -219,9 +269,9 @@ components:
         phone:
           type: string
           description: Número de teléfono de la persona que envía el formulario
-          pattern: "^[0-9]+$"
+          pattern: "^[0-9]{1,12}$"
           maxLength: 15 
-          example: '123456789'
+          example: '123456789123'
         email:
           type: string
           description: Email de la persona que envía el formulario
@@ -231,6 +281,15 @@ components:
           type: string
           description: Mensaje de la persona que envía el formulario
           maxLength: 500 
+    standardContactResponse:
+      allOf: 
+        -  $ref: "#/components/schemas/NewContact"
+        -  type: object
+           properties: 
+            id:
+              type: string
+              format: uuid
+              example: '550e8400-e29b-41d4-a716-446655440000'
     standardErrorResponse:
       description: Modelo con el contenido estándar de respuesta de error
       type: object
@@ -266,16 +325,41 @@ components:
               -  field 
       required: 
         -  errors           
-
   examples: 
-    exampleContact:
-      summary: Ejemplo de contacto
+    exampleContactPost:
+      summary: Ejemplo de creación de contacto
+      value: 
+        name: 'Juan Pérez'
+        phone: '123456789'
+        email: 'juan.perez@example.com'
+        message: 'Hola, me gustaría saber más sobre tus servicios'
+    exampleContactResponse:
+      summary: Ejemplo de contacto completo
       value: 
         id: '550e8400-e29b-41d4-a716-446655440000'
         name: 'Juan Pérez'
         phone: '123456789'
         email: 'juan.perez@example.com'
         message: 'Hola, me gustaría saber más sobre tus servicios' 
+    exampleContactList:
+      summary: Ejemplo lista de contactos
+      value: 
+        data:
+          - id: '550e8400-e29b-41d4-a716-446655440000'
+            name: 'Juan Pérez'
+            phone: '123456789'
+            email: 'juan.perez@example.com'
+            message: 'Hola, me gustaría saber más sobre tus servicios' 
+          - id: '550e8400-e29b-41d4-a716-446655440001'
+            name: 'María López'
+            phone: '987654321'
+            email: 'maria.lopez@example.com'
+            message: 'Me gustaría obtener información sobre sus tarifas.' 
+        pagination:
+          currentPage: 1
+          totalPages: 3
+          totalItems: 45
+          pageSize: 15       
     InvalidRequestExample:
       summary: Errores en los parámetros de entrada
       value: 
@@ -358,3 +442,7 @@ components:
       type: apiKey
       in: header
       name: Authorization
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

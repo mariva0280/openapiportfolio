@@ -12,11 +12,11 @@ info:
     url: https://portfolio.com/license
   termsOfService: https://portfolio.com/terms-Of-Service
 servers:
-  - url: https://localhost:5000/contacts/v1
+  - url: https://localhost:5000/api/v1
     description: Open api Mocker
-  - url: https://api-sandbox.portfolio.com/contacts/v1
+  - url: https://api-sandbox.portfolio.com/api/v1
     description: Sandbox server
-  - url: https://api.portfolio.com/contacts/v1
+  - url: https://api.portfolio.com/api/v1
     description: Production server
 tags:
   - name: Contactos

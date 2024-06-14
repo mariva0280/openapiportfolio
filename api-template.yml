@@ -56,7 +56,7 @@ paths:
                 $ref: '#/components/schemas/standardContactResponse'
               examples:
                 'contactoEjemplo':
-                  $ref: '#/components/examples/exampleContactPost' 
+                  $ref: '#/components/examples/exampleContactResponse' 
         '400':
           description: Error en los parámetros de entrada
           content:

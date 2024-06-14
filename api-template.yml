@@ -22,8 +22,7 @@ tags:
   - name: Contactos
     description: Operaciones y recursos relacionados con formularios de contacto
 security: 
-  -  apiKeyAuth: []  
-  -  bearerAuth: []  
+  -  apiKeyAuth: []    
 paths:
   /contacts:
     post:
@@ -269,9 +268,9 @@ components:
         phone:
           type: string
           description: Número de teléfono de la persona que envía el formulario
-          pattern: "^[0-9]{1,12}$"
+          pattern: "^[0-9]+$"
           maxLength: 15 
-          example: '123456789123'
+          example: '123456789'
         email:
           type: string
           description: Email de la persona que envía el formulario
@@ -442,7 +441,4 @@ components:
       type: apiKey
       in: header
       name: Authorization
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    

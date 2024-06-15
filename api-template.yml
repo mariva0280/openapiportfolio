@@ -440,5 +440,5 @@ components:
     apiKeyAuth:
       type: apiKey
       in: header
-      name: Authorization
+      name: x-api-key
     

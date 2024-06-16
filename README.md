@@ -43,6 +43,9 @@ Esta API usa autenticación con API Key y Bearer Token. Incluye la clave de aute
 Authorization: Bearer YOUR_TOKEN
 Authorization: API_KEY
 
+## Enlace api portal
+https://apigee-portfolio-dev-425810-testportal2.apigee.io/
+
 ## Pruebas con Swagger
 
 Puedes probar y explorar la API usando Swagger UI.Para levantar el entorno de Swagger UI localmente, utiliza Docker Compose con el

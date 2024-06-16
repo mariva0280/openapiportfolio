@@ -14,10 +14,10 @@ info:
 servers:
   - url: https://localhost:5000/api/v1
     description: Open api Mocker
-  - url: https://api-sandbox.portfolio.com/api/v1
-    description: Sandbox server
-  - url: https://api.portfolio.com/api/v1
-    description: Production server
+  - url: https://34.36.190.110.nip.io/contact/v1/contacts
+    description: Contact apigee api proxy
+  - url: https://new-portfolio-server-five.vercel.app/api/contacts
+    description: Production server on vercel
 tags:
   - name: Contactos
     description: Operaciones y recursos relacionados con formularios de contacto

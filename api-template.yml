@@ -12,10 +12,10 @@ info:
     url: https://portfolio.com/license
   termsOfService: https://portfolio.com/terms-Of-Service
 servers:
-  - url: https://localhost:5000/api/v1
-    description: Open api Mocker
   - url: https://34.36.190.110.nip.io/contact/v1/contacts
     description: Contact apigee api proxy
+  - url: https://localhost:5000/api/v1
+    description: Open api Mocker
   - url: https://new-portfolio-server-five.vercel.app/api/contacts
     description: Production server on vercel
 tags:
